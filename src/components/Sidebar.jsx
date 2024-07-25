@@ -63,7 +63,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                 height: "25px",
               }}
             >
-              <Icon as={AiFillHome} />
+              <Icon as={AiFillHome} color="blue.900" />
             </ListIcon>
             Home
           </ListItem>
@@ -157,7 +157,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                       height: "25px",
                     }}
                   >
-                    <Icon as={MdViewKanban} />
+                    <Icon as={MdViewKanban} color="blue.900" />
                   </ListIcon>
                   {`${item?.length < 15 ? item : `${item?.slice(0, 15)}...`}`}
                 </ListItem>
@@ -165,6 +165,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
             </List>
           </Flex>
         </Flex>
+        {/* User profile */}
         <Flex
           sx={{
             direction: "row",
@@ -202,7 +203,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
               },
             }}
           >
-            <PiSignOutBold />
+            <Icon as={PiSignOutBold} color="blue.900" />
           </IconButton>
         </Flex>
       </Box>
@@ -242,7 +243,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                     height: "25px",
                   }}
                 >
-                  <Icon as={AiFillHome} />
+                  <Icon as={AiFillHome} color="blue.900" />
                 </ListIcon>
                 Home
               </ListItem>
@@ -304,7 +305,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                           height: "25px",
                         }}
                       >
-                        <Icon as={MdViewKanban} />
+                        <Icon as={MdViewKanban} color="blue.900" />
                       </ListIcon>
                       {item}
                     </ListItem>
@@ -352,7 +353,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                   },
                 }}
               >
-                <PiSignOutBold />
+                <Icon as={PiSignOutBold} color="blue.900" />
               </IconButton>
             </Flex>
           </DrawerFooter>
