@@ -23,8 +23,13 @@ import { PiSignOutBold } from "react-icons/pi";
 import logo from "../assets/ascend-logo.png";
 import { AiFillHome } from "react-icons/ai";
 import { MdViewKanban } from "react-icons/md";
+import { signOut } from "firebase/auth";
+import { auth } from "../services/authService";
+import { useGlobalState } from "../services/context";
 
 const Sidebar = ({ btnRef, isOpen, onClose }) => {
+  const { user } = useGlobalState();
+
   return (
     <>
       <Box
@@ -182,17 +187,13 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
           }}
         >
           <HStack spacing={2} alignItems="center">
-            <Avatar
-              name="Saumya kanta Panda"
-              src="https://bit.ly/dan-abramov"
-              size="sm"
-            />
+            <Avatar name={user?.name} src={user?.photo} size="sm" />
             <Text
               sx={{
                 fontWeight: 400,
               }}
             >
-              Saumya
+              {user?.name}
             </Text>
           </HStack>
           <IconButton
@@ -202,6 +203,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                 bgColor: "white",
               },
             }}
+            onClick={() => signOut(auth)}
           >
             <Icon as={PiSignOutBold} color="blue.900" />
           </IconButton>
@@ -332,17 +334,13 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
               }}
             >
               <HStack spacing={2} alignItems="center">
-                <Avatar
-                  name="Saumya kanta Panda"
-                  src="https://bit.ly/dan-abramov"
-                  size="sm"
-                />
+                <Avatar name={user?.name} src={user?.photo} size="sm" />
                 <Text
                   sx={{
                     fontWeight: 400,
                   }}
                 >
-                  Saumya
+                  {user?.name}
                 </Text>
               </HStack>
               <IconButton
@@ -352,6 +350,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                     bgColor: "white",
                   },
                 }}
+                onClick={() => signOut(auth)}
               >
                 <Icon as={PiSignOutBold} color="blue.900" />
               </IconButton>
