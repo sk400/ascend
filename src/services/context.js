@@ -5,9 +5,13 @@ const App = createContext();
 export const Provider = ({ children }) => {
   const [user, setUser] = useState(null);
   //   const [userData, setUserData] = useState(null);
-  //   const [projects, setProjects] = useState([]);
+  const [boards, setBoards] = useState(null);
 
-  return <App.Provider value={{ user, setUser }}>{children}</App.Provider>;
+  return (
+    <App.Provider value={{ user, setUser, setBoards, boards }}>
+      {children}
+    </App.Provider>
+  );
 };
 
 export const useGlobalState = () => useContext(App);

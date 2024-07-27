@@ -26,9 +26,20 @@ import { MdViewKanban } from "react-icons/md";
 import { signOut } from "firebase/auth";
 import { auth } from "../services/authService";
 import { useGlobalState } from "../services/context";
+import { useNavigate } from "react-router-dom";
+import { IoMdArchive } from "react-icons/io";
+import { MdDelete } from "react-icons/md";
+import { useLocation } from "react-router-dom";
 
 const Sidebar = ({ btnRef, isOpen, onClose }) => {
-  const { user } = useGlobalState();
+  const { user, boards } = useGlobalState();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const pathname = location.pathname;
+
+  const filteredBoards = boards?.filter(
+    (board) => board?.archived === false && board?.deleted === false
+  );
 
   return (
     <>
@@ -45,21 +56,34 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
           display: { base: "none", lg: "flex" },
         }}
       >
-        <Image objectFit="cover" src={logo} alt="Ascend logo" mt={2} />
+        <Image
+          objectFit="fill"
+          src={logo}
+          alt="Ascend logo"
+          mt={2}
+          sx={{
+            width: "150px",
+            height: "auto",
+          }}
+        />
 
-        {/* Home  */}
-        <List spacing={3}>
+        <List>
+          {/* Home  */}
           <ListItem
             sx={{
               cursor: "pointer",
-              bgColor: "white",
+              bgColor: pathname === "/" ? "blue.900" : "white",
+              color: pathname === "/" ? "gray.50" : "black",
               borderRadius: "lg",
               p: 2,
               fontSize: "18px",
               fontWeight: 400,
               _hover: {
-                bg: "#F5F7FA",
+                bg: pathname === "/" ? "blue.800" : "#F5F7FA",
               },
+            }}
+            onClick={() => {
+              navigate("/");
             }}
           >
             <ListIcon
@@ -68,12 +92,83 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                 height: "25px",
               }}
             >
-              <Icon as={AiFillHome} color="blue.900" />
+              <Icon
+                as={AiFillHome}
+                sx={{
+                  color: pathname === "/" ? "gray.50" : "blue.900",
+                }}
+              />
             </ListIcon>
             Home
           </ListItem>
+          {/* Archive */}
+          <ListItem
+            sx={{
+              cursor: "pointer",
+              bgColor: pathname === "/archive" ? "blue.900" : "white",
+              color: pathname === "/archive" ? "gray.50" : "black",
+              borderRadius: "lg",
+              p: 2,
+              fontSize: "18px",
+              fontWeight: 400,
+              _hover: {
+                bg: pathname === "/archive" ? "blue.800" : "#F5F7FA",
+              },
+            }}
+            onClick={() => {
+              navigate("/archive");
+            }}
+          >
+            <ListIcon
+              sx={{
+                width: "25px",
+                height: "25px",
+              }}
+            >
+              <Icon
+                as={IoMdArchive}
+                sx={{
+                  color: pathname === "/archive" ? "gray.50" : "blue.900",
+                }}
+              />
+            </ListIcon>
+            Archive
+          </ListItem>
+          {/* Bin */}
+          <ListItem
+            sx={{
+              cursor: "pointer",
+              bgColor: pathname === "/bin" ? "blue.900" : "white",
+              color: pathname === "/bin" ? "gray.50" : "black",
+              borderRadius: "lg",
+              p: 2,
+              fontSize: "18px",
+              fontWeight: 400,
+              _hover: {
+                bg: pathname === "/bin" ? "blue.800" : "#F5F7FA",
+              },
+            }}
+            onClick={() => {
+              navigate("/bin");
+            }}
+          >
+            <ListIcon
+              sx={{
+                width: "25px",
+                height: "25px",
+              }}
+            >
+              <Icon
+                as={MdDelete}
+                sx={{
+                  color: pathname === "/bin" ? "gray.50" : "blue.900",
+                }}
+              />
+            </ListIcon>
+            Bin
+          </ListItem>
         </List>
-        {/* Recents and boards */}
+        {/*  boards */}
         <Flex
           direction="column"
           width={"100%"}
@@ -83,36 +178,6 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
             overflowY: "auto",
           }}
         >
-          {/* Recents */}
-          {/* <Flex direction="column" width={"100%"} alignItems={"center"} gap={2}>
-          <Text
-            sx={{
-              fontWeight: 500,
-              alignSelf: "start",
-            }}
-          >
-            Recents
-          </Text>
-          <List spacing={2}>
-            {["Board 1", "Board 3"].map((item) => (
-              <ListItem
-                sx={{
-                  cursor: "pointer",
-                }}
-              >
-                <ListIcon
-                  sx={{
-                    mt: "-2px",
-                    color: "#3546af",
-                  }}
-                >
-                  <MdViewKanban size="24px" />
-                </ListIcon>
-                {item}
-              </ListItem>
-            ))}
-          </List>
-        </Flex> */}
           {/* Your boards */}
           <Flex
             direction="column"
@@ -134,26 +199,28 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                 width: "100%",
               }}
             >
-              {[
-                "React project",
-                "Learn english",
-                "Learn Supapase",
-                "First client",
-                "Understand architecture",
-                "Understand servers",
-              ].map((item, index) => (
+              {filteredBoards?.map((board) => (
                 <ListItem
-                  key={index}
+                  key={board?.id}
                   sx={{
                     cursor: "pointer",
-                    bgColor: "white",
+                    bgColor:
+                      pathname === `/board/${board?.id}` ? "blue.900" : "white",
+                    color:
+                      pathname === `/board/${board?.id}` ? "gray.50" : "black",
                     borderRadius: "lg",
                     p: 2,
                     fontSize: "18px",
                     fontWeight: 400,
                     _hover: {
-                      bg: "#F5F7FA",
+                      bg:
+                        pathname === `/board/${board?.id}`
+                          ? "blue.800"
+                          : "#F5F7FA",
                     },
+                  }}
+                  onClick={() => {
+                    navigate(`/board/${board?.id}`);
                   }}
                 >
                   <ListIcon
@@ -162,9 +229,21 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                       height: "25px",
                     }}
                   >
-                    <Icon as={MdViewKanban} color="blue.900" />
+                    <Icon
+                      as={MdViewKanban}
+                      sx={{
+                        color:
+                          pathname === `/board/${board?.id}`
+                            ? "gray.50"
+                            : "blue.900",
+                      }}
+                    />
                   </ListIcon>
-                  {`${item?.length < 15 ? item : `${item?.slice(0, 15)}...`}`}
+                  {`${
+                    board?.title?.length < 15
+                      ? board?.title
+                      : `${board?.title?.slice(0, 15)}...`
+                  }`}
                 </ListItem>
               ))}
             </List>
@@ -224,19 +303,28 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
           </DrawerHeader>
 
           <DrawerBody>
-            <List>
+            <List
+              sx={{
+                mb: 5,
+              }}
+            >
+              {/* Home */}
               <ListItem
                 sx={{
                   cursor: "pointer",
-                  bgColor: "white",
+                  bgColor: pathname === "/" ? "blue.900" : "white",
+                  color: pathname === "/" ? "gray.50" : "black",
                   borderRadius: "lg",
                   p: 2,
                   fontSize: "18px",
                   fontWeight: 400,
                   _hover: {
-                    bg: "#F5F7FA",
+                    bg: pathname === "/" ? "blue.800" : "#F5F7FA",
                   },
-                  mb: 5,
+                }}
+                onClick={() => {
+                  navigate("/");
+                  onClose();
                 }}
               >
                 <ListIcon
@@ -245,9 +333,82 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                     height: "25px",
                   }}
                 >
-                  <Icon as={AiFillHome} color="blue.900" />
+                  <Icon
+                    as={AiFillHome}
+                    sx={{
+                      color: pathname === "/" ? "gray.50" : "blue.900",
+                    }}
+                  />
                 </ListIcon>
                 Home
+              </ListItem>
+              {/* Archive */}
+              <ListItem
+                sx={{
+                  cursor: "pointer",
+                  bgColor: pathname === "/archive" ? "blue.900" : "white",
+                  color: pathname === "/archive" ? "gray.50" : "black",
+                  borderRadius: "lg",
+                  p: 2,
+                  fontSize: "18px",
+                  fontWeight: 400,
+                  _hover: {
+                    bg: pathname === "/archive" ? "blue.800" : "#F5F7FA",
+                  },
+                }}
+                onClick={() => {
+                  navigate("/archive");
+                  onClose();
+                }}
+              >
+                <ListIcon
+                  sx={{
+                    width: "25px",
+                    height: "25px",
+                  }}
+                >
+                  <Icon
+                    as={IoMdArchive}
+                    sx={{
+                      color: pathname === "/archive" ? "gray.50" : "blue.900",
+                    }}
+                  />
+                </ListIcon>
+                Archive
+              </ListItem>
+              {/* Bin */}
+              <ListItem
+                sx={{
+                  cursor: "pointer",
+                  bgColor: pathname === "/bin" ? "blue.900" : "white",
+                  color: pathname === "/bin" ? "gray.50" : "black",
+                  borderRadius: "lg",
+                  p: 2,
+                  fontSize: "18px",
+                  fontWeight: 400,
+                  _hover: {
+                    bg: pathname === "/bin" ? "blue.800" : "#F5F7FA",
+                  },
+                }}
+                onClick={() => {
+                  navigate("/bin");
+                  onClose();
+                }}
+              >
+                <ListIcon
+                  sx={{
+                    width: "25px",
+                    height: "25px",
+                  }}
+                >
+                  <Icon
+                    as={MdDelete}
+                    sx={{
+                      color: pathname === "/bin" ? "gray.50" : "blue.900",
+                    }}
+                  />
+                </ListIcon>
+                Bin
               </ListItem>
             </List>
             <Flex
@@ -279,26 +440,33 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                     width: "100%",
                   }}
                 >
-                  {[
-                    "React project",
-                    "Learn english",
-                    "Learn Supapase",
-                    "First client",
-                    "Understand architecture",
-                    "Understand servers",
-                  ].map((item, index) => (
+                  {filteredBoards?.map((board) => (
                     <ListItem
-                      key={index}
+                      key={board?.id}
                       sx={{
                         cursor: "pointer",
-                        bgColor: "white",
+                        bgColor:
+                          pathname === `/board/${board?.id}`
+                            ? "blue.900"
+                            : "white",
+                        color:
+                          pathname === `/board/${board?.id}`
+                            ? "gray.50"
+                            : "black",
                         borderRadius: "lg",
                         p: 2,
                         fontSize: "18px",
                         fontWeight: 400,
                         _hover: {
-                          bg: "#F5F7FA",
+                          bg:
+                            pathname === `/board/${board?.id}`
+                              ? "blue.800"
+                              : "#F5F7FA",
                         },
+                      }}
+                      onClick={() => {
+                        navigate(`/board/${board?.id}`);
+                        onClose();
                       }}
                     >
                       <ListIcon
@@ -307,9 +475,17 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                           height: "25px",
                         }}
                       >
-                        <Icon as={MdViewKanban} color="blue.900" />
+                        <Icon
+                          as={MdViewKanban}
+                          sx={{
+                            color:
+                              pathname === `/board/${board?.id}`
+                                ? "gray.50"
+                                : "blue.900",
+                          }}
+                        />
                       </ListIcon>
-                      {item}
+                      {board?.title}
                     </ListItem>
                   ))}
                 </List>

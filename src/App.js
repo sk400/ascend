@@ -1,4 +1,5 @@
 import { Layout } from "./components";
+import { Home, Archive, Bin } from "./pages";
 import "./styles/App.css";
 import { Box, useToast } from "@chakra-ui/react";
 
@@ -11,13 +12,14 @@ import {
 import CreateKanban from "./features/kanban-board/components/CreateKanban";
 import KanbanBoard from "./features/kanban-board/components/KanbanBoard";
 import { useEffect } from "react";
-import { auth } from "./services/authService";
-import { useNavigate } from "react-router-dom";
+import { auth, db } from "./services/authService";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import { useGlobalState } from "./services/context";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 
 function App() {
   const navigate = useNavigate();
-  const { setUser } = useGlobalState();
+  const { setUser, setBoards } = useGlobalState();
   const toast = useToast();
 
   useEffect(() => {
@@ -69,6 +71,24 @@ function App() {
         //     uid: user?.uid,
         //   })
         // );
+
+        const boardQuery = query(
+          collection(db, "users", user?.email, "boards"),
+          orderBy("createdAt", "desc")
+        );
+
+        onSnapshot(boardQuery, (querySnapshot) => {
+          const documents = querySnapshot?.docs?.map((doc) => ({
+            ...doc?.data(),
+            id: doc?.id,
+          }));
+
+          if (documents?.length) {
+            setBoards(documents);
+          } else {
+            setBoards([]);
+          }
+        });
         navigate("/");
       } else {
         // localStorage.removeItem("user");
@@ -93,8 +113,12 @@ function App() {
           {/* Create board */}
           <CreateKanban />
 
-          {/* Kanban board */}
-          <KanbanBoard />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/archive" element={<Archive />} />
+            <Route path="/bin" element={<Bin />} />
+            <Route path="/board/:boardId" element={<KanbanBoard />} />
+          </Routes>
         </Box>
       </Layout>
     </>
