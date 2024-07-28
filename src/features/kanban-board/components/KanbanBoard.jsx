@@ -1,4 +1,4 @@
-import { Flex, Heading, SimpleGrid } from "@chakra-ui/react";
+import { Box, Flex, Heading, SimpleGrid } from "@chakra-ui/react";
 import React, { useState } from "react";
 import List from "../../list/components/List";
 import CreateListItem from "../../list-item/components/CreateListItem";
@@ -15,40 +15,64 @@ const KanbanBoard = () => {
 
         <Flex
           direction="column"
-          gap={5}
           sx={{
-            bgColor: "white",
             borderRadius: "3xl",
-            p: { base: 3, lg: 5 },
           }}
         >
-          <CreateListItem type="Todo" numOfItems={numberOfTodo} />
+          <Box
+            sx={{
+              p: { base: 3, lg: 5 },
+              bgColor: "white",
+              borderTopRadius: "xl",
+              borderBottomRadius: numberOfTodo === 0 ? "xl" : "none",
+            }}
+          >
+            <CreateListItem type="Todo" numOfItems={numberOfTodo} />
+          </Box>
           <List type="todo" setterFunction={setNumberOfTodo} />
         </Flex>
         {/* In progress */}
         <Flex
           direction="column"
-          gap={5}
           sx={{
-            bgColor: "white",
             borderRadius: "3xl",
-            p: { base: 3, lg: 5 },
+            height: "auto",
           }}
         >
-          <CreateListItem type="In progress" numOfItems={numberOfInProgress} />
+          <Box
+            sx={{
+              p: { base: 3, lg: 5 },
+              bgColor: "white",
+              borderTopRadius: "xl",
+              borderBottomRadius: numberOfInProgress === 0 ? "xl" : "none",
+            }}
+          >
+            <CreateListItem
+              type="In progress"
+              numOfItems={numberOfInProgress}
+            />
+          </Box>
+
           <List type="inprogress" setterFunction={setNumberOfInProgress} />
         </Flex>
         {/* Completed */}
         <Flex
           direction="column"
-          gap={5}
           sx={{
-            bgColor: "white",
             borderRadius: "3xl",
-            p: { base: 3, lg: 5 },
           }}
         >
-          <CreateListItem type="Completed" numOfItems={numberOfCompleted} />
+          <Box
+            sx={{
+              p: { base: 3, lg: 5 },
+              bgColor: "white",
+              borderTopRadius: "xl",
+              borderBottomRadius: numberOfCompleted === 0 ? "xl" : "none",
+            }}
+          >
+            <CreateListItem type="Completed" numOfItems={numberOfCompleted} />
+          </Box>
+
           <List type="completed" setterFunction={setNumberOfCompleted} />
         </Flex>
         {/* Reviewed */}

@@ -48,8 +48,18 @@ const List = ({ type, setterFunction }) => {
     return () => unsubscribe();
   }, [type, user?.email, boardId]);
 
+  if (!tasks?.length) return;
+
   return (
-    <Flex direction="column" gap={3}>
+    <Flex
+      direction="column"
+      gap={3}
+      sx={{
+        p: { base: 3, lg: 5 },
+        bgColor: "white",
+        borderBottomRadius: "xl",
+      }}
+    >
       {tasks?.map((task) => (
         <ListItem key={task.id} task={task} boardId={boardId} type={type} />
       ))}
