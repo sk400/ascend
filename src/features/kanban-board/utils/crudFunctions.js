@@ -1,7 +1,6 @@
 import {
   addDoc,
   collection,
-  deleteDoc,
   doc,
   serverTimestamp,
   updateDoc,
@@ -24,14 +23,14 @@ export const createBoard = async ({ data, user }) => {
   }
 };
 
-export const deleteBoard = async ({ user, boardId }) => {
-  try {
-    await deleteDoc(doc(db, "users", user?.email, "boards", boardId));
-    console.log("Board deleted successfully");
-  } catch (error) {
-    console.log(error);
-  }
-};
+// export const deleteBoard = async ({ user, boardId }) => {
+//   try {
+//     await deleteDoc(doc(db, "users", user?.email, "boards", boardId));
+//     console.log("Board deleted successfully");
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 export const changeBoardState = async ({ user, boardId, state }) => {
   try {

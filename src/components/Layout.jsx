@@ -23,7 +23,7 @@ const Layout = ({ children }) => {
         sx={{
           width: "100%",
           height: "100vh",
-          overflowY: "none",
+          overflowY: "auto",
           bgColor: "gray.50",
         }}
       >

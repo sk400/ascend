@@ -12,7 +12,7 @@ const Navbar = ({ onOpen }) => {
         alignItems="center"
         shadow="md"
         sx={{
-          display: { base: "flex", lg: "none" },
+          display: { base: "flex", xl: "none" },
           p: 3,
           bgColor: "white",
           position: "sticky",

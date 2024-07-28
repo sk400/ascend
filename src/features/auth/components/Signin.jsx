@@ -58,7 +58,7 @@ const Signup = () => {
       toast({
         title: "Email link sent",
         description:
-          "A link is sent to your given email address. Please check your inbox and click the link to sign up.",
+          "A link is sent to your given email address. Please check your inbox and click the link to sign in.",
         status: "info",
         duration: 9000,
         isClosable: true,
@@ -137,7 +137,7 @@ const Signup = () => {
               <Stack>
                 <Text align={"center"}>
                   Create account{" "}
-                  <Link to="/sign-up" style={{ color: "#0BC5EA" }}>
+                  <Link to="/sign-up" style={{ color: "#1A365D" }}>
                     Sign up
                   </Link>
                 </Text>

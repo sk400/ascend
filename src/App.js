@@ -62,15 +62,15 @@ function App() {
           uid: user?.uid,
         });
 
-        // localStorage.setItem(
-        //   "user",
-        //   JSON.stringify({
-        //     name: user?.displayName,
-        //     email: user?.email,
-        //     photo: user?.photoURL,
-        //     uid: user?.uid,
-        //   })
-        // );
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            name: user?.displayName,
+            email: user?.email,
+            photo: user?.photoURL,
+            uid: user?.uid,
+          })
+        );
 
         const boardQuery = query(
           collection(db, "users", user?.email, "boards"),
@@ -91,7 +91,7 @@ function App() {
         });
         navigate("/");
       } else {
-        // localStorage.removeItem("user");
+        localStorage.removeItem("user");
         navigate("/sign-up");
       }
     });

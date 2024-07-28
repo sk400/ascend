@@ -138,7 +138,7 @@ const Signup = () => {
               <Stack>
                 <Text align={"center"}>
                   Already a user?{" "}
-                  <Link to="/sign-in" style={{ color: "#0BC5EA" }}>
+                  <Link to="/sign-in" style={{ color: "#1A365D" }}>
                     Sign in
                   </Link>
                 </Text>
