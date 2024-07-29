@@ -27,18 +27,44 @@ import {
 import { IoMdMore } from "react-icons/io";
 import { deleteListItem, updateListItem } from "../utils/crudFunctions";
 import { useState } from "react";
+import { Draggable } from "react-beautiful-dnd";
+import { useGlobalState } from "../../../services/context";
 
-const ListItem = ({ task, boardId, type }) => {
+const ListItem = ({ task, boardId, type, index }) => {
   const user = JSON.parse(localStorage.getItem("user"));
   const [newData, setNewData] = useState(task);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { setBoards } = useGlobalState();
 
   const handleDelete = () => {
+    // UI update
+
+    setBoards((prevBoards) => {
+      const boardIndex = prevBoards?.findIndex((board) => board.id === boardId);
+      if (boardIndex === -1) {
+        return prevBoards;
+      }
+
+      let updatedBoards = [...prevBoards];
+
+      updatedBoards[boardIndex] = {
+        ...updatedBoards[boardIndex],
+        tasks: {
+          ...updatedBoards[boardIndex].tasks,
+          [type]: updatedBoards[boardIndex].tasks[type].filter(
+            (item) => item.id !== task?.id
+          ),
+        },
+      };
+
+      return updatedBoards;
+    });
+
     deleteListItem({
-      taskId: task?.id,
       user: user,
       boardId: boardId,
       type: type,
+      taskId: task?.id,
     });
   };
 
@@ -55,6 +81,32 @@ const ListItem = ({ task, boardId, type }) => {
       return;
     }
 
+    // ui update
+
+    setBoards((prevBoards) => {
+      const boardIndex = prevBoards?.findIndex((board) => board.id === boardId);
+      if (boardIndex === -1) {
+        return prevBoards;
+      }
+
+      let updatedBoards = [...prevBoards];
+
+      updatedBoards[boardIndex] = {
+        ...updatedBoards[boardIndex],
+        tasks: {
+          ...updatedBoards[boardIndex].tasks,
+          [type]: updatedBoards[boardIndex].tasks[type].map((item) => {
+            if (item.id === task?.id) {
+              return newData;
+            }
+            return item;
+          }),
+        },
+      };
+
+      return updatedBoards;
+    });
+
     updateListItem({
       data: newData,
       user: user,
@@ -63,72 +115,84 @@ const ListItem = ({ task, boardId, type }) => {
       taskId: task?.id,
     });
     onClose();
-    setNewData({});
+    // setNewData({});
   };
 
   return (
     <>
-      <Card
-        sx={{
-          borderRadius: "3xl",
-          minW: "100%",
-        }}
-      >
-        <CardBody
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: 3,
-          }}
-        >
-          <Flex direction="row" justifyContent={"space-between"} width="100%">
-            <Tag size={"sm"} variant="solid" colorScheme="yellow">
-              {task?.priority}
-            </Tag>
-            <Menu>
-              <MenuButton
-                sx={{
-                  bgColor: "white",
-                  color: "blue.900",
-
-                  _hover: {
-                    bgColor: "white",
-                  },
-                  borderRadius: "lg",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
+      <Draggable draggableId={task?.id} index={index}>
+        {(provided) => (
+          <Card
+            {...provided.draggableProps}
+            ref={provided.innerRef}
+            {...provided.dragHandleProps}
+            sx={{
+              borderRadius: "3xl",
+              width: "100%",
+            }}
+          >
+            <CardBody
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: 3,
+              }}
+            >
+              <Flex
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
               >
-                <Icon as={IoMdMore} />
-              </MenuButton>
-              <MenuList sx={{}}>
-                <MenuItem
-                  sx={{}}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onOpen();
-                  }}
-                >
-                  Edit
-                </MenuItem>
-                <MenuItem
-                  sx={{}}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleDelete();
-                  }}
-                >
-                  Delete
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
-          <Heading size="md">{task?.title}</Heading>
-          <Text>{task?.description}</Text>
-        </CardBody>
-      </Card>
+                <Tag size={"sm"} variant="solid" colorScheme="yellow">
+                  {task?.priority}
+                </Tag>
+                <Menu>
+                  <MenuButton
+                    sx={{
+                      bgColor: "white",
+                      color: "blue.900",
+
+                      _hover: {
+                        bgColor: "white",
+                      },
+                      borderRadius: "lg",
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    <Icon as={IoMdMore} />
+                  </MenuButton>
+                  <MenuList sx={{}}>
+                    <MenuItem
+                      sx={{}}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onOpen();
+                      }}
+                    >
+                      Edit
+                    </MenuItem>
+                    <MenuItem
+                      sx={{}}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete();
+                      }}
+                    >
+                      Delete
+                    </MenuItem>
+                  </MenuList>
+                </Menu>
+              </Flex>
+              <Heading size="md">{task?.title}</Heading>
+              <Text>{task?.description}</Text>
+            </CardBody>
+          </Card>
+        )}
+      </Draggable>
+
       {/* Edit modal */}
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

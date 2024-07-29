@@ -13,6 +13,11 @@ export const createBoard = async ({ data, user }) => {
       ...data,
       deleted: false,
       archived: false,
+      tasks: {
+        todo: [],
+        inprogress: [],
+        completed: [],
+      },
       createdAt: serverTimestamp(),
     };
 

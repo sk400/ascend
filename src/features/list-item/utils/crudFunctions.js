@@ -4,6 +4,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDoc,
   serverTimestamp,
   updateDoc,
 } from "firebase/firestore";
@@ -22,22 +23,24 @@ export const createListItem = async ({ data, user, boardId, type }) => {
     )
       return;
 
-    await addDoc(
-      collection(
-        db,
-        "users",
-        user?.email,
-        "boards",
-        boardId,
-        "type",
-        type,
-        "tasks"
-      ),
-      {
-        ...data,
-        createdAt: serverTimestamp(),
-      }
-    );
+    // Get the doc
+
+    const boardDocRef = doc(db, "users", user?.email, "boards", boardId);
+    const boardDocSnap = await getDoc(boardDocRef);
+    const boardDoc = boardDocSnap?.data();
+
+    const newTypeArray = boardDoc?.tasks[type] || [];
+    newTypeArray.push({
+      ...data,
+    });
+
+    await updateDoc(boardDocRef, {
+      tasks: {
+        ...boardDoc.tasks,
+        [type]: newTypeArray,
+      },
+    });
+
     console.log("Task created successfully");
   } catch (error) {
     console.log(error);
@@ -58,20 +61,26 @@ export const updateListItem = async ({ data, user, boardId, type, taskId }) => {
     )
       return;
 
-    const document = doc(
-      db,
-      "users",
-      user?.email,
-      "boards",
-      boardId,
-      "type",
-      type,
-      "tasks",
-      taskId
-    );
+    const boardDocRef = doc(db, "users", user?.email, "boards", boardId);
+    const boardDocSnap = await getDoc(boardDocRef);
+    const boardDoc = boardDocSnap?.data();
 
-    await updateDoc(document, {
-      ...data,
+    const newTypeArray = boardDoc?.tasks[type] || [];
+
+    const updatedArray = newTypeArray.map((task) => {
+      if (task.id === taskId) {
+        return data;
+      }
+
+      return task;
+    });
+
+    await updateDoc(boardDocRef, {
+      ...boardDoc,
+      tasks: {
+        ...boardDoc.tasks,
+        [type]: updatedArray,
+      },
     });
     console.log("Task updated successfully");
   } catch (error) {
@@ -81,25 +90,27 @@ export const updateListItem = async ({ data, user, boardId, type, taskId }) => {
 
 // Delete list-item
 
-export const deleteListItem = async ({ taskId, user, boardId, type }) => {
+export const deleteListItem = async ({ user, boardId, type, taskId }) => {
   try {
-    if (!taskId || !user || !boardId || !type) {
+    if (!user || !boardId || !type || !taskId) {
       return;
     }
 
-    const document = doc(
-      db,
-      "users",
-      user?.email,
-      "boards",
-      boardId,
-      "type",
-      type,
-      "tasks",
-      taskId
-    );
+    const boardDocRef = doc(db, "users", user?.email, "boards", boardId);
+    const boardDocSnap = await getDoc(boardDocRef);
+    const boardDoc = boardDocSnap?.data();
 
-    await deleteDoc(document);
+    const newTypeArray = boardDoc?.tasks[type] || [];
+
+    const filteredTasks = newTypeArray.filter((task) => task.id !== taskId);
+
+    await updateDoc(boardDocRef, {
+      tasks: {
+        ...boardDoc.tasks,
+        [type]: filteredTasks,
+      },
+    });
+
     console.log("Task deleted successfully");
   } catch (error) {
     console.log(error);
