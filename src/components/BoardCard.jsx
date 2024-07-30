@@ -7,18 +7,45 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalFooter,
+  ModalBody,
+  useDisclosure,
+  Button,
+  Input,
 } from "@chakra-ui/react";
 import { IoMdMore } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
-import { changeBoardState } from "../features/kanban-board/utils/crudFunctions";
+import {
+  changeBoardState,
+  editBoard,
+} from "../features/kanban-board/utils/crudFunctions";
 import { useGlobalState } from "../services/context";
+import { useState } from "react";
 
 const BoardCard = ({ board }) => {
   const navigate = useNavigate();
   const { user } = useGlobalState();
+  const [boardTitle, setBoardTitle] = useState(board?.title);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   const isArchived = board?.archived;
   const isDeleted = board?.deleted;
+
+  const handleEdit = () => {
+    editBoard({
+      user,
+      boardId: board?.id,
+      data: {
+        title: boardTitle,
+      },
+    });
+
+    onClose();
+    setBoardTitle("");
+  };
 
   return (
     <>
@@ -72,7 +99,10 @@ const BoardCard = ({ board }) => {
                   bgColor: "blue.800",
                 },
               }}
-              onClick={(e) => e.stopPropagation()}
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpen();
+              }}
             >
               Edit
             </MenuItem>
@@ -123,6 +153,51 @@ const BoardCard = ({ board }) => {
           </MenuList>
         </Menu>
       </Card>
+      {/* Edit modal */}
+
+      <Modal isCentered onClose={onClose} isOpen={isOpen} motionPreset="scale">
+        <ModalOverlay />
+        <ModalContent>
+          <ModalBody
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: 3,
+              pt: 10,
+            }}
+          >
+            <Input
+              variant="filled"
+              placeholder="Title"
+              focusBorderColor="blue.900"
+              type="text"
+              name="title"
+              sx={{
+                p: 3,
+                bg: "gray.100",
+              }}
+              value={boardTitle.title}
+              onChange={(e) => setBoardTitle(e.target.value)}
+            />
+          </ModalBody>
+          <ModalFooter gap={5}>
+            <Button onClick={onClose}>close</Button>
+            <Button
+              sx={{
+                bgColor: "blue.800",
+                color: "white",
+                _hover: {
+                  bg: "blue.900",
+                },
+              }}
+              mr={3}
+              onClick={handleEdit}
+            >
+              Save
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
