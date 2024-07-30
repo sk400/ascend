@@ -37,7 +37,7 @@ const Signup = () => {
   };
 
   const actionCodeSettings = {
-    url: "http://localhost:3000",
+    url: "https://ascend-eta.vercel.app",
     handleCodeInApp: true,
   };
 
