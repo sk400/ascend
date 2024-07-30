@@ -48,7 +48,7 @@ const List = ({ type }) => {
   const currentBoard = boards?.find((board) => board.id === boardId);
   const allTasks = currentBoard?.tasks[type];
 
-  if (!allTasks?.length) return;
+  // if (!allTasks?.length) return;
 
   return (
     <>
@@ -63,6 +63,7 @@ const List = ({ type }) => {
               p: { base: 3, lg: 5 },
               bgColor: "white",
               borderBottomRadius: "xl",
+              // minHeight: "100px",
             }}
           >
             {allTasks?.map((task, index) => (

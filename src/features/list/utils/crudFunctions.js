@@ -27,3 +27,34 @@ export const updatePosition = async ({ user, boardId, type, updatedArray }) => {
     console.log(error);
   }
 };
+
+export const moveTask = async ({
+  user,
+  boardId,
+  from,
+  to,
+  sourceArray,
+  finishArray,
+}) => {
+  try {
+    if (!user || !boardId || !from || !to) {
+      return;
+    }
+
+    const boardDocRef = doc(db, "users", user?.email, "boards", boardId);
+    const boardDocSnap = await getDoc(boardDocRef);
+    const boardDoc = boardDocSnap?.data();
+
+    await updateDoc(boardDocRef, {
+      tasks: {
+        ...boardDoc.tasks,
+        [from]: sourceArray,
+        [to]: finishArray,
+      },
+    });
+
+    console.log("Task moved successfully");
+  } catch (error) {
+    console.log(error);
+  }
+};

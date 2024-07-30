@@ -5,12 +5,11 @@ import CreateListItem from "../../list-item/components/CreateListItem";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { useGlobalState } from "../../../services/context";
 import { useParams } from "react-router-dom";
-import { updatePosition } from "../../list/utils/crudFunctions";
+import { moveTask, updatePosition } from "../../list/utils/crudFunctions";
 
 const KanbanBoard = () => {
   const { boards, setBoards, user } = useGlobalState();
   const { boardId } = useParams();
-  const [updatedArray, setupdatedArray] = useState([]);
 
   const currentBoard = boards?.find((board) => board.id === boardId);
 
@@ -23,8 +22,12 @@ const KanbanBoard = () => {
 
     const [removed] = newArray.splice(sourceIndex, 1);
     newArray.splice(destinationIndex, 0, removed);
-    setupdatedArray(newArray);
+
     return newArray;
+  };
+
+  const addItemToArray = (array, index) => {
+    let newArray = [...array];
   };
 
   const handleDragEnd = (result) => {
@@ -41,6 +44,50 @@ const KanbanBoard = () => {
       return;
     }
 
+    const startColumn = source.droppableId;
+    const finishColumn = destination.droppableId;
+
+    if (startColumn === finishColumn) {
+      setBoards((prevBoards) => {
+        const boardIndex = prevBoards?.findIndex(
+          (board) => board.id === boardId
+        );
+        if (boardIndex === -1) {
+          return prevBoards;
+        }
+
+        let updatedBoards = [...prevBoards];
+
+        const updatedItems = arrayMove(
+          updatedBoards[boardIndex].tasks[destination.droppableId],
+          source.index,
+          destination.index
+        );
+
+        updatedBoards[boardIndex] = {
+          ...updatedBoards[boardIndex],
+          tasks: {
+            ...updatedBoards[boardIndex].tasks,
+            [destination.droppableId]: updatedItems,
+          },
+        };
+
+        updatePosition({
+          user,
+          boardId,
+          type: destination.droppableId,
+          updatedArray: updatedItems,
+        });
+
+        return updatedBoards;
+      });
+
+      return;
+    }
+
+    const startIndex = source.index;
+    const finishIndex = destination.index;
+
     setBoards((prevBoards) => {
       const boardIndex = prevBoards?.findIndex((board) => board.id === boardId);
       if (boardIndex === -1) {
@@ -49,25 +96,32 @@ const KanbanBoard = () => {
 
       let updatedBoards = [...prevBoards];
 
-      const updatedItems = arrayMove(
-        updatedBoards[boardIndex].tasks[destination.droppableId],
-        source.index,
-        destination.index
-      );
+      const currentBoard = updatedBoards[boardIndex];
+      const sourceArray = currentBoard.tasks[startColumn];
+      const finishArray = currentBoard.tasks[finishColumn];
+
+      const [removed] = sourceArray.splice(startIndex, 1);
+
+      finishArray.splice(finishIndex, 0, removed);
 
       updatedBoards[boardIndex] = {
         ...updatedBoards[boardIndex],
         tasks: {
           ...updatedBoards[boardIndex].tasks,
-          [destination.droppableId]: updatedItems,
+          [startColumn]: sourceArray,
+          [finishColumn]: finishArray,
         },
       };
 
-      updatePosition({
+      // DB update
+
+      moveTask({
         user,
         boardId,
-        type: destination.droppableId,
-        updatedArray: updatedItems,
+        from: startColumn,
+        to: finishColumn,
+        sourceArray,
+        finishArray,
       });
 
       return updatedBoards;
