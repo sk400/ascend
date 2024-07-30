@@ -20,6 +20,7 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 function App() {
   const navigate = useNavigate();
   const { setUser, setBoards } = useGlobalState();
+
   const toast = useToast();
 
   useEffect(() => {
@@ -96,6 +97,7 @@ function App() {
       }
     });
   }, []);
+
   return (
     <>
       <Layout>

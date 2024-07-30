@@ -176,7 +176,7 @@ const BoardCard = ({ board }) => {
                 p: 3,
                 bg: "gray.100",
               }}
-              value={boardTitle.title}
+              value={boardTitle}
               onChange={(e) => setBoardTitle(e.target.value)}
             />
           </ModalBody>
