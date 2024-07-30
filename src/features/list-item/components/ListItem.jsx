@@ -120,7 +120,7 @@ const ListItem = ({ task, boardId, type, index }) => {
 
   return (
     <>
-      <Draggable draggableId={task?.id} index={index}>
+      <Draggable draggableId={task?.id.toString()} index={index}>
         {(provided) => (
           <Card
             {...provided.draggableProps}

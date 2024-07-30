@@ -26,7 +26,7 @@ import { createListItem } from "../utils/crudFunctions";
 
 const CreateListItem = ({ type, numOfItems }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { user, boards, setBoards } = useGlobalState();
+  const { user, setBoards } = useGlobalState();
   const { boardId } = useParams();
   const [data, setData] = useState({});
 

@@ -5,16 +5,27 @@ import CreateListItem from "../../list-item/components/CreateListItem";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { useGlobalState } from "../../../services/context";
 import { useParams } from "react-router-dom";
+import { updatePosition } from "../../list/utils/crudFunctions";
 
 const KanbanBoard = () => {
-  const { boards } = useGlobalState();
+  const { boards, setBoards, user } = useGlobalState();
   const { boardId } = useParams();
+  const [updatedArray, setupdatedArray] = useState([]);
 
   const currentBoard = boards?.find((board) => board.id === boardId);
 
   const numberOfTodo = currentBoard?.tasks?.todo?.length;
-  const numberOfInProgress = currentBoard?.tasks?.inProgress?.length;
+  const numberOfInProgress = currentBoard?.tasks?.inprogress?.length;
   const numberOfCompleted = currentBoard?.tasks?.completed?.length;
+
+  const arrayMove = (array, sourceIndex, destinationIndex) => {
+    let newArray = [...array];
+
+    const [removed] = newArray.splice(sourceIndex, 1);
+    newArray.splice(destinationIndex, 0, removed);
+    setupdatedArray(newArray);
+    return newArray;
+  };
 
   const handleDragEnd = (result) => {
     const { source, destination } = result;
@@ -30,8 +41,37 @@ const KanbanBoard = () => {
       return;
     }
 
-    // newArray.splice(0, 1)
-    // newArray.splice(4, 0, 'May');
+    setBoards((prevBoards) => {
+      const boardIndex = prevBoards?.findIndex((board) => board.id === boardId);
+      if (boardIndex === -1) {
+        return prevBoards;
+      }
+
+      let updatedBoards = [...prevBoards];
+
+      const updatedItems = arrayMove(
+        updatedBoards[boardIndex].tasks[destination.droppableId],
+        source.index,
+        destination.index
+      );
+
+      updatedBoards[boardIndex] = {
+        ...updatedBoards[boardIndex],
+        tasks: {
+          ...updatedBoards[boardIndex].tasks,
+          [destination.droppableId]: updatedItems,
+        },
+      };
+
+      updatePosition({
+        user,
+        boardId,
+        type: destination.droppableId,
+        updatedArray: updatedItems,
+      });
+
+      return updatedBoards;
+    });
   };
 
   return (
@@ -51,7 +91,7 @@ const KanbanBoard = () => {
                 p: { base: 3, lg: 5 },
                 bgColor: "white",
                 borderTopRadius: "xl",
-                borderBottomRadius: numberOfTodo === 0 ? "xl" : "none",
+                borderBottomRadius: !numberOfTodo ? "xl" : "none",
               }}
             >
               <CreateListItem type="Todo" numOfItems={numberOfTodo} />
@@ -72,7 +112,7 @@ const KanbanBoard = () => {
                 p: { base: 3, lg: 5 },
                 bgColor: "white",
                 borderTopRadius: "xl",
-                borderBottomRadius: numberOfInProgress === 0 ? "xl" : "none",
+                borderBottomRadius: !numberOfInProgress ? "xl" : "none",
               }}
             >
               <CreateListItem
@@ -94,7 +134,7 @@ const KanbanBoard = () => {
                 p: { base: 3, lg: 5 },
                 bgColor: "white",
                 borderTopRadius: "xl",
-                borderBottomRadius: numberOfCompleted === 0 ? "xl" : "none",
+                borderBottomRadius: !numberOfCompleted ? "xl" : "none",
               }}
             >
               <CreateListItem type="Completed" numOfItems={numberOfCompleted} />
