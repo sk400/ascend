@@ -1,8 +1,8 @@
-import { Box, Flex, Heading, SimpleGrid } from "@chakra-ui/react";
-import React, { useState } from "react";
+import { Box, Flex, SimpleGrid } from "@chakra-ui/react";
+
 import List from "../../list/components/List";
 import CreateListItem from "../../list-item/components/CreateListItem";
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { DragDropContext } from "react-beautiful-dnd";
 import { useGlobalState } from "../../../services/context";
 import { useParams } from "react-router-dom";
 import { moveTask, updatePosition } from "../../list/utils/crudFunctions";
@@ -11,7 +11,7 @@ const KanbanBoard = () => {
   const { boards, setBoards, user } = useGlobalState();
   const { boardId } = useParams();
 
-  const currentBoard = boards?.find((board) => board.id === boardId);
+  const currentBoard = boards?.find((board) => board.id.toString() === boardId);
 
   const numberOfTodo = currentBoard?.tasks?.todo?.length;
   const numberOfInProgress = currentBoard?.tasks?.inprogress?.length;
@@ -24,10 +24,6 @@ const KanbanBoard = () => {
     newArray.splice(destinationIndex, 0, removed);
 
     return newArray;
-  };
-
-  const addItemToArray = (array, index) => {
-    let newArray = [...array];
   };
 
   const handleDragEnd = (result) => {
@@ -50,7 +46,7 @@ const KanbanBoard = () => {
     if (startColumn === finishColumn) {
       setBoards((prevBoards) => {
         const boardIndex = prevBoards?.findIndex(
-          (board) => board.id === boardId
+          (board) => board.id.toString() === boardId
         );
         if (boardIndex === -1) {
           return prevBoards;
@@ -72,12 +68,14 @@ const KanbanBoard = () => {
           },
         };
 
-        updatePosition({
-          user,
-          boardId,
-          type: destination.droppableId,
-          updatedArray: updatedItems,
-        });
+        if (user?.email) {
+          updatePosition({
+            user,
+            boardId,
+            type: destination.droppableId,
+            updatedArray: updatedItems,
+          });
+        }
 
         return updatedBoards;
       });
@@ -89,7 +87,9 @@ const KanbanBoard = () => {
     const finishIndex = destination.index;
 
     setBoards((prevBoards) => {
-      const boardIndex = prevBoards?.findIndex((board) => board.id === boardId);
+      const boardIndex = prevBoards?.findIndex(
+        (board) => board.id.toString() === boardId
+      );
       if (boardIndex === -1) {
         return prevBoards;
       }
@@ -115,14 +115,16 @@ const KanbanBoard = () => {
 
       // DB update
 
-      moveTask({
-        user,
-        boardId,
-        from: startColumn,
-        to: finishColumn,
-        sourceArray,
-        finishArray,
-      });
+      if (user?.email) {
+        moveTask({
+          user,
+          boardId,
+          from: startColumn,
+          to: finishColumn,
+          sourceArray,
+          finishArray,
+        });
+      }
 
       return updatedBoards;
     });

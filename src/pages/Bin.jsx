@@ -45,7 +45,9 @@ const Bin = () => {
       return prevBoards.filter((board) => !board.deleted);
     });
 
-    emptyBin({ user });
+    if (user?.email) {
+      emptyBin({ user, boardId: null });
+    }
     onClose();
   };
 

@@ -26,7 +26,7 @@ import { createListItem } from "../utils/crudFunctions";
 
 const CreateListItem = ({ type, numOfItems }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { user, setBoards } = useGlobalState();
+  const { user, setBoards, boards } = useGlobalState();
   const { boardId } = useParams();
   const [data, setData] = useState({});
 
@@ -47,13 +47,16 @@ const CreateListItem = ({ type, numOfItems }) => {
       alert("Please provide all the required fields");
       return;
     }
+
     const newItem = {
       ...data,
       id: Date.now(),
     };
 
     setBoards((prevBoards) => {
-      const boardIndex = prevBoards?.findIndex((board) => board.id === boardId);
+      const boardIndex = prevBoards?.findIndex(
+        (board) => board?.id.toString() === boardId
+      );
 
       if (boardIndex === -1) {
         return prevBoards;
@@ -73,12 +76,14 @@ const CreateListItem = ({ type, numOfItems }) => {
       return updatedBoards;
     });
 
-    createListItem({
-      data: newItem,
-      user,
-      boardId,
-      type: itemType,
-    });
+    if (user?.email) {
+      createListItem({
+        data: newItem,
+        user,
+        boardId,
+        type: itemType,
+      });
+    }
     onClose();
     setData({});
   };

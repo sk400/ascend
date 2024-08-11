@@ -45,7 +45,7 @@ const List = ({ type }) => {
   //   return () => unsubscribe();
   // }, [type, user?.email, boardId]);
 
-  const currentBoard = boards?.find((board) => board.id === boardId);
+  const currentBoard = boards?.find((board) => board.id.toString() === boardId);
   const allTasks = currentBoard?.tasks[type];
 
   // if (!allTasks?.length) return;

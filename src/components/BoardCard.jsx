@@ -27,7 +27,7 @@ import { useState } from "react";
 
 const BoardCard = ({ board }) => {
   const navigate = useNavigate();
-  const { user } = useGlobalState();
+  const { user, setBoards } = useGlobalState();
   const [boardTitle, setBoardTitle] = useState(board?.title);
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -35,16 +35,74 @@ const BoardCard = ({ board }) => {
   const isDeleted = board?.deleted;
 
   const handleEdit = () => {
-    editBoard({
-      user,
-      boardId: board?.id,
-      data: {
-        title: boardTitle,
-      },
+    if (user?.email) {
+      editBoard({
+        user,
+        boardId: board?.id,
+        data: {
+          title: boardTitle,
+        },
+      });
+    }
+
+    setBoards((prevBoards) => {
+      return prevBoards?.map((item) => {
+        if (item?.id === board?.id) {
+          board.title = boardTitle;
+          return item;
+        }
+        return item;
+      });
     });
 
     onClose();
     setBoardTitle("");
+  };
+
+  const handleArchiveState = () => {
+    setBoards((prevBoards) => {
+      return prevBoards.map((item) => {
+        if (item?.id === board?.id) {
+          board.archived = isArchived ? false : true;
+          return item;
+        }
+        return item;
+      });
+    });
+
+    if (user?.email) {
+      changeBoardState({
+        user,
+        boardId: board?.id,
+        state: {
+          archived: isArchived ? false : true,
+          deleted: false,
+        },
+      });
+    }
+  };
+
+  const handleDelete = () => {
+    setBoards((prevBoards) => {
+      return prevBoards?.map((item) => {
+        if (item?.id === board?.id) {
+          board.deleted = isDeleted ? false : true;
+          return item;
+        }
+        return item;
+      });
+    });
+
+    if (user?.email) {
+      changeBoardState({
+        user,
+        boardId: board?.id,
+        state: {
+          archived: false,
+          deleted: isDeleted ? false : true,
+        },
+      });
+    }
   };
 
   return (
@@ -116,14 +174,7 @@ const BoardCard = ({ board }) => {
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                changeBoardState({
-                  user,
-                  boardId: board?.id,
-                  state: {
-                    archived: isArchived ? false : true,
-                    deleted: false,
-                  },
-                });
+                handleArchiveState();
               }}
             >
               {isArchived ? "Unarchive" : "Archive"}
@@ -138,14 +189,7 @@ const BoardCard = ({ board }) => {
               }}
               onClick={(e) => {
                 e.stopPropagation();
-                changeBoardState({
-                  user,
-                  boardId: board?.id,
-                  state: {
-                    archived: false,
-                    deleted: isDeleted ? false : true,
-                  },
-                });
+                handleDelete();
               }}
             >
               {isDeleted ? "Remove from " : "Add to "}Bin

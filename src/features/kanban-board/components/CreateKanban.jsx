@@ -20,7 +20,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CreateKanban = () => {
-  const { user } = useGlobalState();
+  const { user, boards, setBoards } = useGlobalState();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [boardData, setBoardData] = useState({ title: "" });
@@ -38,10 +38,30 @@ const CreateKanban = () => {
       return;
     }
 
-    createBoard({
-      data: boardData,
-      user,
+    setBoards((prevBoards) => {
+      return [
+        ...prevBoards,
+        {
+          id: Date.now().toString(),
+          title: boardData?.title,
+          archived: false,
+          deleted: false,
+          tasks: {
+            todo: [],
+            inprogress: [],
+            completed: [],
+          },
+        },
+      ];
     });
+
+    if (user?.email) {
+      createBoard({
+        data: boardData,
+        user,
+      });
+    }
+
     setBoardData({ title: "", description: "" });
     navigate("/", { replace: true });
     onClose();

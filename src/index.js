@@ -7,6 +7,7 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import Signup from "./features/auth/components/Signup";
 import Signin from "./features/auth/components/Signin";
 import { Provider } from "./services/context";
+import SignInAnonymously from "./features/auth/components/SignInAnonymously";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -17,6 +18,7 @@ root.render(
           <Route path="/*" element={<App />} />
           <Route path="/sign-up" element={<Signup />} />
           <Route path="/sign-in" element={<Signin />} />
+          <Route path="/guest-mode" element={<SignInAnonymously />} />
         </Routes>
       </Router>
     </Provider>

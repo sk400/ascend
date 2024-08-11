@@ -73,23 +73,26 @@ function App() {
           })
         );
 
-        const boardQuery = query(
-          collection(db, "users", user?.email, "boards"),
-          orderBy("createdAt", "desc")
-        );
+        if (user?.email) {
+          const boardQuery = query(
+            collection(db, "users", user?.email, "boards"),
+            orderBy("createdAt", "asc")
+          );
 
-        onSnapshot(boardQuery, (querySnapshot) => {
-          const documents = querySnapshot?.docs?.map((doc) => ({
-            ...doc?.data(),
-            id: doc?.id,
-          }));
+          onSnapshot(boardQuery, (querySnapshot) => {
+            const documents = querySnapshot?.docs?.map((doc) => ({
+              ...doc?.data(),
+              id: doc?.id,
+            }));
 
-          if (documents?.length) {
-            setBoards(documents);
-          } else {
-            setBoards([]);
-          }
-        });
+            if (documents?.length) {
+              setBoards(documents);
+            } else {
+              setBoards([]);
+            }
+          });
+        }
+
         navigate("/");
       } else {
         localStorage.removeItem("user");

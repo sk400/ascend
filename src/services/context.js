@@ -4,7 +4,7 @@ const App = createContext();
 
 export const Provider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [boards, setBoards] = useState(null);
+  const [boards, setBoards] = useState([]);
 
   return (
     <App.Provider value={{ user, setUser, setBoards, boards }}>

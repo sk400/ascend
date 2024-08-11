@@ -40,7 +40,9 @@ const ListItem = ({ task, boardId, type, index }) => {
     // UI update
 
     setBoards((prevBoards) => {
-      const boardIndex = prevBoards?.findIndex((board) => board.id === boardId);
+      const boardIndex = prevBoards?.findIndex(
+        (board) => board.id.toString() === boardId
+      );
       if (boardIndex === -1) {
         return prevBoards;
       }
@@ -60,12 +62,14 @@ const ListItem = ({ task, boardId, type, index }) => {
       return updatedBoards;
     });
 
-    deleteListItem({
-      user: user,
-      boardId: boardId,
-      type: type,
-      taskId: task?.id,
-    });
+    if (user?.email) {
+      deleteListItem({
+        user: user,
+        boardId: boardId,
+        type: type,
+        taskId: task?.id,
+      });
+    }
   };
 
   const handleChange = (e) => {
@@ -75,7 +79,7 @@ const ListItem = ({ task, boardId, type, index }) => {
     });
   };
 
-  const handleClick = () => {
+  const handleEdit = () => {
     if (!newData?.title || !newData?.description || !newData?.priority) {
       alert("Please provide all the required fields");
       return;
@@ -84,7 +88,9 @@ const ListItem = ({ task, boardId, type, index }) => {
     // ui update
 
     setBoards((prevBoards) => {
-      const boardIndex = prevBoards?.findIndex((board) => board.id === boardId);
+      const boardIndex = prevBoards?.findIndex(
+        (board) => board.id.toString() === boardId
+      );
       if (boardIndex === -1) {
         return prevBoards;
       }
@@ -107,15 +113,16 @@ const ListItem = ({ task, boardId, type, index }) => {
       return updatedBoards;
     });
 
-    updateListItem({
-      data: newData,
-      user: user,
-      boardId: boardId,
-      type: type,
-      taskId: task?.id,
-    });
+    if (user?.email) {
+      updateListItem({
+        data: newData,
+        user: user,
+        boardId: boardId,
+        type: type,
+        taskId: task?.id,
+      });
+    }
     onClose();
-    // setNewData({});
   };
 
   return (
@@ -257,7 +264,7 @@ const ListItem = ({ task, boardId, type, index }) => {
                     bg: "blue.800",
                   }}
                   width="full"
-                  onClick={handleClick}
+                  onClick={handleEdit}
                 >
                   Save
                 </Button>

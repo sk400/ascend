@@ -427,75 +427,77 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
               }}
             >
               {/* Your boards */}
-              <Flex
-                direction="column"
-                width={"100%"}
-                alignItems={"start"}
-                gap={2}
-              >
-                <Text
-                  sx={{
-                    fontWeight: 500,
-                    fontSize: "18px",
-                  }}
+              {filteredBoards?.length > 0 && (
+                <Flex
+                  direction="column"
+                  width={"100%"}
+                  alignItems={"start"}
+                  gap={2}
                 >
-                  Your boards
-                </Text>
-                <List
-                  sx={{
-                    width: "100%",
-                  }}
-                >
-                  {filteredBoards?.map((board) => (
-                    <ListItem
-                      key={board?.id}
-                      sx={{
-                        cursor: "pointer",
-                        bgColor:
-                          pathname === `/board/${board?.id}`
-                            ? "blue.900"
-                            : "white",
-                        color:
-                          pathname === `/board/${board?.id}`
-                            ? "gray.50"
-                            : "black",
-                        borderRadius: "lg",
-                        p: 2,
-                        fontSize: "18px",
-                        fontWeight: 400,
-                        _hover: {
-                          bg:
-                            pathname === `/board/${board?.id}`
-                              ? "blue.800"
-                              : "#F5F7FA",
-                        },
-                      }}
-                      onClick={() => {
-                        navigate(`/board/${board?.id}`);
-                        onClose();
-                      }}
-                    >
-                      <ListIcon
+                  <Text
+                    sx={{
+                      fontWeight: 500,
+                      fontSize: "18px",
+                    }}
+                  >
+                    Your boards
+                  </Text>
+                  <List
+                    sx={{
+                      width: "100%",
+                    }}
+                  >
+                    {filteredBoards?.map((board) => (
+                      <ListItem
+                        key={board?.id}
                         sx={{
-                          width: "25px",
-                          height: "25px",
+                          cursor: "pointer",
+                          bgColor:
+                            pathname === `/board/${board?.id}`
+                              ? "blue.900"
+                              : "white",
+                          color:
+                            pathname === `/board/${board?.id}`
+                              ? "gray.50"
+                              : "black",
+                          borderRadius: "lg",
+                          p: 2,
+                          fontSize: "18px",
+                          fontWeight: 400,
+                          _hover: {
+                            bg:
+                              pathname === `/board/${board?.id}`
+                                ? "blue.800"
+                                : "#F5F7FA",
+                          },
+                        }}
+                        onClick={() => {
+                          navigate(`/board/${board?.id}`);
+                          onClose();
                         }}
                       >
-                        <Icon
-                          as={MdViewKanban}
+                        <ListIcon
                           sx={{
-                            color:
-                              pathname === `/board/${board?.id}`
-                                ? "gray.50"
-                                : "blue.900",
+                            width: "25px",
+                            height: "25px",
                           }}
-                        />
-                      </ListIcon>
-                      {board?.title}
-                    </ListItem>
-                  ))}
-                </List>
-              </Flex>
+                        >
+                          <Icon
+                            as={MdViewKanban}
+                            sx={{
+                              color:
+                                pathname === `/board/${board?.id}`
+                                  ? "gray.50"
+                                  : "blue.900",
+                            }}
+                          />
+                        </ListIcon>
+                        {board?.title}
+                      </ListItem>
+                    ))}
+                  </List>
+                </Flex>
+              )}
             </Flex>
           </DrawerBody>
 
