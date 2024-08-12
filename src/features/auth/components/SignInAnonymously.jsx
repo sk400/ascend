@@ -8,7 +8,7 @@ import {
   Image,
   Icon,
 } from "@chakra-ui/react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import logo from "../../../assets/ascend-logo.png";
 import { BsIncognito } from "react-icons/bs";
 import { signInAnonymously } from "firebase/auth";
@@ -16,13 +16,29 @@ import { auth } from "../../../services/authService";
 
 const SignInAnonymously = () => {
   const navigate = useNavigate();
+
+  /**
+   * Sign in as a guest.
+   *
+   * This function asynchronously signs in the user anonymously using the Firebase
+   * Authentication SDK. If the sign-in is successful, the user is redirected
+   * to the home page. If an error occurs during the sign-in process, it is logged
+   * to the console.
+   *
+   * @return {Promise<void>} A Promise that resolves when the sign-in is complete.
+   */
   const signInAsAguest = async () => {
     try {
+      // Sign in the user anonymously
       await signInAnonymously(auth);
+
+      // Log a success message to the console
       console.log("Signed in as a guest successfully");
 
+      // Redirect the user to the home page
       navigate("/", { replace: true });
     } catch (error) {
+      // Log any errors that occur during the sign-in process
       console.log(error);
     }
   };
@@ -53,9 +69,12 @@ const SignInAnonymously = () => {
                 sx={{
                   textAlign: "center",
                   mb: 5,
+                  maxWidth: "250px",
+                  mx: "auto",
                 }}
               >
-                You are signing in as a guest. So your data will not be stored
+                Dive in and explore! No sign-in required, but your data won't be
+                saved.
               </Text>
               <Button
                 size="lg"
@@ -64,7 +83,7 @@ const SignInAnonymously = () => {
                 onClick={() => navigate("/sign-up")}
                 gap="3"
               >
-                Register
+                Sign up
               </Button>
               <Button
                 size="lg"
@@ -74,7 +93,7 @@ const SignInAnonymously = () => {
                 gap="3"
               >
                 <Icon as={BsIncognito} color="blue.900" />
-                Sign in Anonymously
+                Try anonymously
               </Button>
             </Stack>
           </Stack>

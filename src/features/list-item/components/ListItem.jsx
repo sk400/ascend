@@ -36,9 +36,15 @@ const ListItem = ({ task, boardId, type, index }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { setBoards } = useGlobalState();
 
+  /**
+   * Handle delete event for a task.
+   * This function updates the UI by removing the task from the board and
+   * calls the deleteListItem function to delete the task from the database.
+   */
   const handleDelete = () => {
     // UI update
 
+    // Find the index of the board in the boards array
     setBoards((prevBoards) => {
       const boardIndex = prevBoards?.findIndex(
         (board) => board.id.toString() === boardId
@@ -47,8 +53,10 @@ const ListItem = ({ task, boardId, type, index }) => {
         return prevBoards;
       }
 
+      // Create a copy of the boards array
       let updatedBoards = [...prevBoards];
 
+      // Remove the task from the board's tasks array
       updatedBoards[boardIndex] = {
         ...updatedBoards[boardIndex],
         tasks: {
@@ -59,14 +67,20 @@ const ListItem = ({ task, boardId, type, index }) => {
         },
       };
 
+      // Return the updated boards array
       return updatedBoards;
     });
 
+    // If the user is logged in, call the deleteListItem function to delete the task from the database
     if (user?.email) {
       deleteListItem({
+        // User object
         user: user,
+        // ID of the board
         boardId: boardId,
+        // Type of the task (e.g., "todo", "in-progress", "done")
         type: type,
+        // ID of the task
         taskId: task?.id,
       });
     }
@@ -79,15 +93,23 @@ const ListItem = ({ task, boardId, type, index }) => {
     });
   };
 
+  /**
+   * Handles the edit event for a task.
+   * This function updates the UI and calls the updateListItem function to update the task in the database.
+   * It checks if all the required fields are provided and alerts the user if any of them are missing.
+   * If all the required fields are provided, it updates the task in the UI and calls the updateListItem function to update the task in the database.
+   */
   const handleEdit = () => {
+    // Check if all the required fields are provided
     if (!newData?.title || !newData?.description || !newData?.priority) {
+      // Alert the user if any of the required fields are missing
       alert("Please provide all the required fields");
       return;
     }
 
-    // ui update
-
+    // UI update
     setBoards((prevBoards) => {
+      // Find the index of the board in the boards array
       const boardIndex = prevBoards?.findIndex(
         (board) => board.id.toString() === boardId
       );
@@ -97,11 +119,13 @@ const ListItem = ({ task, boardId, type, index }) => {
 
       let updatedBoards = [...prevBoards];
 
+      // Update the task in the board's tasks array
       updatedBoards[boardIndex] = {
         ...updatedBoards[boardIndex],
         tasks: {
           ...updatedBoards[boardIndex].tasks,
           [type]: updatedBoards[boardIndex].tasks[type].map((item) => {
+            // Update the task if it matches the provided task ID
             if (item.id === task?.id) {
               return newData;
             }
@@ -110,15 +134,22 @@ const ListItem = ({ task, boardId, type, index }) => {
         },
       };
 
+      // Return the updated boards array
       return updatedBoards;
     });
 
+    // If the user is logged in, call the updateListItem function to update the task in the database
     if (user?.email) {
       updateListItem({
+        // Data object containing the updated task details
         data: newData,
+        // User object
         user: user,
+        // ID of the board
         boardId: boardId,
+        // Type of the task (e.g., "todo", "in-progress", "done")
         type: type,
+        // ID of the task
         taskId: task?.id,
       });
     }

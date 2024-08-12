@@ -12,15 +12,13 @@ import {
   Input,
 } from "@chakra-ui/react";
 import { IoIosAddCircleOutline } from "react-icons/io";
-
 import { useGlobalState } from "../../../services/context";
-
 import { createBoard } from "../utils/crudFunctions";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const CreateKanban = () => {
-  const { user, boards, setBoards } = useGlobalState();
+  const { user, setBoards } = useGlobalState();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [boardData, setBoardData] = useState({ title: "" });
@@ -32,29 +30,40 @@ const CreateKanban = () => {
     }
   };
 
+  /**
+   * Handles the click event when the user clicks on the submit button of the modal.
+   * It creates a new board object and adds it to the boards array in the global state.
+   * It also calls the createBoard function to save the board data to the database.
+   * Finally, it closes the modal and navigates to the home page.
+   */
   const handleClick = () => {
+    // Check if the board title is provided and if the user is authenticated
     if (!boardData?.title || !user) {
+      // Display an alert to the user if any of the required fields are missing
       alert("Please provide all the required fields");
       return;
     }
 
+    // Create a new board object with the provided data
+    const newBoard = {
+      id: Date.now(), // Generate a unique ID for the board
+      title: boardData?.title, // Set the title of the board
+      archived: false, // Set the archived status to false
+      deleted: false, // Set the deleted status to false
+
+      tasks: {
+        todo: [], // Initialize the todo tasks array
+        inprogress: [], // Initialize the in-progress tasks array
+        completed: [], // Initialize the completed tasks array
+      },
+    };
+
+    // Update the boards array in the global state by adding the new board
     setBoards((prevBoards) => {
-      return [
-        ...prevBoards,
-        {
-          id: Date.now().toString(),
-          title: boardData?.title,
-          archived: false,
-          deleted: false,
-          tasks: {
-            todo: [],
-            inprogress: [],
-            completed: [],
-          },
-        },
-      ];
+      return [...prevBoards, { ...newBoard }];
     });
 
+    // Call the createBoard function to save the board data to the database
     if (user?.email) {
       createBoard({
         data: boardData,
@@ -62,8 +71,13 @@ const CreateKanban = () => {
       });
     }
 
+    // Reset the board data state to empty values
     setBoardData({ title: "", description: "" });
+
+    // Navigate to the home page and replace the current URL in the browser history
     navigate("/", { replace: true });
+
+    // Close the modal
     onClose();
   };
 

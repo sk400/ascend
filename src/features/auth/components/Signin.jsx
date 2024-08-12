@@ -24,14 +24,27 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const toast = useToast();
 
+  /**
+   * Sign in the user with Google.
+   *
+   * This function attempts to sign in the user with Google. If the sign-in is
+   * successful, the user is redirected to the home page. If an error occurs
+   * during the sign-in process, it is logged to the console.
+   *
+   * @return {void} This function does not return anything.
+   */
   const signInWithGoogle = () => {
+    // Attempt to sign in the user with Google
     signInWithPopup(auth, provider)
       .then(() => {
+        // Log a success message to the console
         console.log("Signed in successfully");
 
+        // Redirect the user to the home page
         navigate("/", { replace: true });
       })
       .catch((error) => {
+        // Log any errors that occur during the sign-in process
         console.log(error);
       });
   };
@@ -41,9 +54,25 @@ const Signup = () => {
     handleCodeInApp: true,
   };
 
+  /**
+   * Sign in the user with their email address.
+   *
+   * This function sends a sign-in link to the user's email address. If the email
+   * is provided, it first checks if the email is empty. If the email is not
+   * empty, it sends the sign-in link using `sendSignInLinkToEmail` from the
+   * Firebase Auth library. It then stores the email in the browser's local
+   * storage. After sending the email link, it displays a success toast
+   * notification. If an error occurs during the process, it displays an error
+   * toast notification and logs the error to the console.
+   *
+   * @return {Promise<void>} A promise that resolves when the sign-in process is
+   * complete.
+   */
   const signInWithEmail = async () => {
     try {
+      // Check if the email is provided
       if (!email) {
+        // Display an error toast notification if the email is empty
         toast({
           title: "Please provide your email address.",
           status: "error",
@@ -53,8 +82,14 @@ const Signup = () => {
         });
         return;
       }
+
+      // Send the sign-in link to the user's email address
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+
+      // Store the email in the browser's local storage
       window.localStorage.setItem("emailForSignIn", email);
+
+      // Display a success toast notification
       toast({
         title: "Email link sent",
         description:
@@ -64,8 +99,11 @@ const Signup = () => {
         isClosable: true,
         position: "top",
       });
+
+      // Clear the email input field
       setEmail("");
     } catch (error) {
+      // Display an error toast notification and log the error to the console
       toast({
         title: "Error sending email link",
         description:
@@ -77,12 +115,10 @@ const Signup = () => {
       });
       console.error("Error sending email:", error);
     } finally {
+      // Clear the email input field
       setEmail("");
     }
   };
-
-  // saumyakantapanda7855@gmail.com
-  // skdeveloper101@gmail.com
 
   return (
     <Flex
@@ -116,7 +152,6 @@ const Signup = () => {
                 loadingText="Submitting"
                 size="lg"
                 bg={"white"}
-                // leftIcon={}
                 boxShadow={"md"}
                 onClick={() => signInWithEmail()}
                 gap="3"

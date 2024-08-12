@@ -24,14 +24,24 @@ const Signup = () => {
   const [email, setEmail] = useState("");
   const toast = useToast();
 
+  /**
+   * Sign up the user with Google.
+   * After successful sign up, the user is redirected to the home page.
+   * If an error occurs, it is logged to the console.
+   *
+   * @return {Promise<void>} A promise that resolves when the sign up process is complete.
+   */
   const signInWithGoogle = () => {
+    // Sign up the user with Google
     signInWithPopup(auth, provider)
       .then(() => {
+        // If sign up is successful, log the success message and redirect to home page
         console.log("Signed up successfully");
 
         navigate("/", { replace: true });
       })
       .catch((error) => {
+        // If an error occurs, log the error message
         console.log(error);
       });
   };
@@ -41,9 +51,25 @@ const Signup = () => {
     handleCodeInApp: true,
   };
 
+  /**
+   * Sign up the user with their email address.
+   *
+   * This function sends a sign-up link to the user's email address. If the email
+   * is provided, it first checks if the email is empty. If the email is not
+   * empty, it sends the sign-up link using `sendSignInLinkToEmail` from the
+   * Firebase Auth library. It then stores the email in the browser's local
+   * storage. After sending the email link, it displays a success toast
+   * notification. If an error occurs during the process, it displays an error
+   * toast notification and logs the error to the console.
+   *
+   * @return {Promise<void>} A promise that resolves when the sign-up process is
+   * complete.
+   */
   const signUpWithEmail = async () => {
     try {
+      // Check if the email is provided
       if (!email) {
+        // Display an error toast notification if the email is empty
         toast({
           title: "Please provide your email address.",
           status: "error",
@@ -53,8 +79,14 @@ const Signup = () => {
         });
         return;
       }
+
+      // Send the sign-up link to the user's email address
       await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+
+      // Store the email in the browser's local storage
       window.localStorage.setItem("emailForSignIn", email);
+
+      // Display a success toast notification
       toast({
         title: "Email link sent",
         description:
@@ -64,8 +96,11 @@ const Signup = () => {
         isClosable: true,
         position: "top",
       });
+
+      // Clear the email input field
       setEmail("");
     } catch (error) {
+      // Display an error toast notification and log the error to the console
       toast({
         title: "Error sending email link",
         description:
@@ -77,6 +112,7 @@ const Signup = () => {
       });
       console.error("Error sending email:", error);
     } finally {
+      // Clear the email input field regardless of success or failure
       setEmail("");
     }
   };
@@ -135,7 +171,7 @@ const Signup = () => {
                 Sign up with Google
               </Button>
 
-              <Stack>
+              <Stack direction={"column"}>
                 <Text align={"center"}>
                   Already a user?{" "}
                   <Link to="/sign-in" style={{ color: "#1A365D" }}>

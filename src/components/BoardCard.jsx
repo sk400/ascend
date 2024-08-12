@@ -34,20 +34,30 @@ const BoardCard = ({ board }) => {
   const isArchived = board?.archived;
   const isDeleted = board?.deleted;
 
+  /**
+   * Handle the edit action for the board.
+   * This function updates the board title and calls the editBoard function
+   * to update the board title in the database.
+   */
   const handleEdit = () => {
+    // Check if the user is logged in
     if (user?.email) {
+      // Call the editBoard function to update the board title in the database
       editBoard({
-        user,
-        boardId: board?.id,
+        user, // The user object
+        boardId: board?.id, // The ID of the board
         data: {
-          title: boardTitle,
+          // The data to be updated
+          title: boardTitle, // The new title of the board
         },
       });
     }
 
+    // Update the boards state with the new title
     setBoards((prevBoards) => {
       return prevBoards?.map((item) => {
         if (item?.id === board?.id) {
+          board.title = boardTitle; // Update the title of the board
           board.title = boardTitle;
           return item;
         }
@@ -55,51 +65,67 @@ const BoardCard = ({ board }) => {
       });
     });
 
+    // Close the modal and reset the board title state
     onClose();
+    setBoardTitle(""); // Reset the board title state
     setBoardTitle("");
   };
 
+  /**
+   * Handles the archive state of a board.
+   * Updates the 'archived' state of a board in the local state and
+   * in the database.
+   */
   const handleArchiveState = () => {
+    // Update the 'archived' state of the board in the local state
     setBoards((prevBoards) => {
       return prevBoards.map((item) => {
         if (item?.id === board?.id) {
-          board.archived = isArchived ? false : true;
+          board.archived = isArchived ? false : true; // Toggle the archived state
           return item;
         }
         return item;
       });
     });
 
+    // If the user is logged in, update the 'archived' state of the board in the database
     if (user?.email) {
       changeBoardState({
-        user,
-        boardId: board?.id,
+        user, // The user object
+        boardId: board?.id, // The ID of the board
         state: {
-          archived: isArchived ? false : true,
-          deleted: false,
+          archived: isArchived ? false : true, // The new archived state
+          deleted: false, // The deleted state remains unchanged
         },
       });
     }
   };
 
+  /**
+   * Handles the delete state of a board.
+   * Updates the 'deleted' state of a board in the local state and
+   * in the database.
+   */
   const handleDelete = () => {
+    // Update the 'deleted' state of the board in the local state
     setBoards((prevBoards) => {
       return prevBoards?.map((item) => {
         if (item?.id === board?.id) {
-          board.deleted = isDeleted ? false : true;
+          board.deleted = isDeleted ? false : true; // Toggle the deleted state
           return item;
         }
         return item;
       });
     });
 
+    // If the user is logged in, update the 'deleted' state of the board in the database
     if (user?.email) {
       changeBoardState({
-        user,
-        boardId: board?.id,
+        user, // The user object
+        boardId: board?.id, // The ID of the board
         state: {
-          archived: false,
-          deleted: isDeleted ? false : true,
+          archived: false, // The archived state remains unchanged
+          deleted: isDeleted ? false : true, // The new deleted state
         },
       });
     }

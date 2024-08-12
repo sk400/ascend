@@ -19,20 +19,30 @@ const KanbanBoard = () => {
 
   const arrayMove = (array, sourceIndex, destinationIndex) => {
     let newArray = [...array];
-
     const [removed] = newArray.splice(sourceIndex, 1);
     newArray.splice(destinationIndex, 0, removed);
-
     return newArray;
   };
 
+  /**
+   * Handle the drag end event.
+   * @param {Object} result - The result of the drag end event.
+   * @param {Object} result.source - The source of the drag end event.
+   * @param {string} result.source.droppableId - The ID of the droppable area where the drag started.
+   * @param {number} result.source.index - The index of the dragged item in its droppable area.
+   * @param {Object} result.destination - The destination of the drag end event.
+   * @param {string} result.destination.droppableId - The ID of the droppable area where the drag ended.
+   * @param {number} result.destination.index - The index where the dragged item will be placed in its droppable area.
+   */
   const handleDragEnd = (result) => {
     const { source, destination } = result;
 
+    // If there is no destination, return
     if (!destination) {
       return;
     }
 
+    // If the source and destination are the same, return
     if (
       source.droppableId === destination.droppableId &&
       source.index === destination.index
@@ -40,9 +50,11 @@ const KanbanBoard = () => {
       return;
     }
 
+    // Get the start and end column of the drag
     const startColumn = source.droppableId;
     const finishColumn = destination.droppableId;
 
+    // If the start and end column are the same, update the task order in the column and return
     if (startColumn === finishColumn) {
       setBoards((prevBoards) => {
         const boardIndex = prevBoards?.findIndex(
@@ -69,6 +81,7 @@ const KanbanBoard = () => {
         };
 
         if (user?.email) {
+          // Update the position of the task in the database
           updatePosition({
             user,
             boardId,
@@ -83,9 +96,11 @@ const KanbanBoard = () => {
       return;
     }
 
+    // Get the start and end index of the drag
     const startIndex = source.index;
     const finishIndex = destination.index;
 
+    // Update the task order in the board and the database
     setBoards((prevBoards) => {
       const boardIndex = prevBoards?.findIndex(
         (board) => board.id.toString() === boardId
@@ -97,12 +112,12 @@ const KanbanBoard = () => {
       let updatedBoards = [...prevBoards];
 
       const currentBoard = updatedBoards[boardIndex];
-      const sourceArray = currentBoard.tasks[startColumn];
-      const finishArray = currentBoard.tasks[finishColumn];
+      const sourceArray = currentBoard.tasks[startColumn] || [];
+      const finishArray = currentBoard.tasks[finishColumn] || [];
 
-      const [removed] = sourceArray.splice(startIndex, 1);
+      const [removed] = sourceArray?.splice(startIndex, 1);
 
-      finishArray.splice(finishIndex, 0, removed);
+      finishArray?.splice(finishIndex, 0, removed);
 
       updatedBoards[boardIndex] = {
         ...updatedBoards[boardIndex],
@@ -113,6 +128,7 @@ const KanbanBoard = () => {
         },
       };
 
+      // Update the task order in the database
       // DB update
 
       if (user?.email) {

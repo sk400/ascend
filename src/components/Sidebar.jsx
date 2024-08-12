@@ -1,10 +1,7 @@
 import {
-  Avatar,
   Box,
   Flex,
-  HStack,
   Icon,
-  IconButton,
   Image,
   List,
   ListIcon,
@@ -19,17 +16,14 @@ import {
   DrawerCloseButton,
 } from "@chakra-ui/react";
 
-import { PiSignOutBold } from "react-icons/pi";
 import logo from "../assets/ascend-logo.png";
 import { AiFillHome } from "react-icons/ai";
 import { MdViewKanban } from "react-icons/md";
-import { signOut } from "firebase/auth";
-import { auth } from "../services/authService";
 import { useGlobalState } from "../services/context";
-import { useNavigate } from "react-router-dom";
 import { IoMdArchive } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import UserButton from "./UserButton";
 
 const Sidebar = ({ btnRef, isOpen, onClose }) => {
   const { user, boards } = useGlobalState();
@@ -40,6 +34,24 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
   const filteredBoards = boards?.filter(
     (board) => board?.archived === false && board?.deleted === false
   );
+
+  const listItemsData = [
+    {
+      name: "Home",
+      icon: AiFillHome,
+      path: "/",
+    },
+    {
+      name: "Archived",
+      icon: IoMdArchive,
+      path: "/archive",
+    },
+    {
+      name: "Bin",
+      icon: MdDelete,
+      path: "/bin",
+    },
+  ];
 
   return (
     <>
@@ -68,105 +80,41 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
         />
 
         <List>
-          {/* Home  */}
-          <ListItem
-            sx={{
-              cursor: "pointer",
-              bgColor: pathname === "/" ? "blue.900" : "white",
-              color: pathname === "/" ? "gray.50" : "black",
-              borderRadius: "lg",
-              p: 2,
-              fontSize: "18px",
-              fontWeight: 400,
-              _hover: {
-                bg: pathname === "/" ? "blue.800" : "#F5F7FA",
-              },
-            }}
-            onClick={() => {
-              navigate("/");
-            }}
-          >
-            <ListIcon
+          {listItemsData?.map((item) => (
+            <ListItem
               sx={{
-                width: "25px",
-                height: "25px",
+                cursor: "pointer",
+                bgColor: pathname === item.path ? "blue.900" : "white",
+                color: pathname === item.path ? "gray.50" : "black",
+                borderRadius: "lg",
+                p: 2,
+                fontSize: "18px",
+                fontWeight: 400,
+                _hover: {
+                  bg: pathname === item.path ? "blue.800" : "#F5F7FA",
+                },
+              }}
+              onClick={() => {
+                navigate(item.path);
               }}
             >
-              <Icon
-                as={AiFillHome}
+              <ListIcon
                 sx={{
-                  color: pathname === "/" ? "gray.50" : "blue.900",
+                  width: "25px",
+                  height: "25px",
                 }}
-              />
-            </ListIcon>
-            Home
-          </ListItem>
-          {/* Archive */}
-          <ListItem
-            sx={{
-              cursor: "pointer",
-              bgColor: pathname === "/archive" ? "blue.900" : "white",
-              color: pathname === "/archive" ? "gray.50" : "black",
-              borderRadius: "lg",
-              p: 2,
-              fontSize: "18px",
-              fontWeight: 400,
-              _hover: {
-                bg: pathname === "/archive" ? "blue.800" : "#F5F7FA",
-              },
-            }}
-            onClick={() => {
-              navigate("/archive");
-            }}
-          >
-            <ListIcon
-              sx={{
-                width: "25px",
-                height: "25px",
-              }}
-            >
-              <Icon
-                as={IoMdArchive}
-                sx={{
-                  color: pathname === "/archive" ? "gray.50" : "blue.900",
-                }}
-              />
-            </ListIcon>
-            Archive
-          </ListItem>
-          {/* Bin */}
-          <ListItem
-            sx={{
-              cursor: "pointer",
-              bgColor: pathname === "/bin" ? "blue.900" : "white",
-              color: pathname === "/bin" ? "gray.50" : "black",
-              borderRadius: "lg",
-              p: 2,
-              fontSize: "18px",
-              fontWeight: 400,
-              _hover: {
-                bg: pathname === "/bin" ? "blue.800" : "#F5F7FA",
-              },
-            }}
-            onClick={() => {
-              navigate("/bin");
-            }}
-          >
-            <ListIcon
-              sx={{
-                width: "25px",
-                height: "25px",
-              }}
-            >
-              <Icon
-                as={MdDelete}
-                sx={{
-                  color: pathname === "/bin" ? "gray.50" : "blue.900",
-                }}
-              />
-            </ListIcon>
-            Bin
-          </ListItem>
+              >
+                <Icon
+                  as={item.icon}
+                  sx={{
+                    color: pathname === item.path ? "gray.50" : "blue.900",
+                  }}
+                />
+              </ListIcon>
+
+              {item.name}
+            </ListItem>
+          ))}
         </List>
         {/*  boards */}
         {filteredBoards?.length !== 0 && (
@@ -256,43 +204,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
           </Flex>
         )}
         {/* User profile */}
-        <Flex
-          sx={{
-            direction: "row",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "100%",
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            height: "60px",
-            px: 3,
-            borderTop: "solid 1px",
-            borderTopColor: "#E2E8F0",
-          }}
-        >
-          <HStack spacing={2} alignItems="center">
-            <Avatar name={user?.name} src={user?.photo} size="sm" />
-            <Text
-              sx={{
-                fontWeight: 400,
-              }}
-            >
-              {user?.name}
-            </Text>
-          </HStack>
-          <IconButton
-            sx={{
-              bgColor: "white",
-              _hover: {
-                bgColor: "white",
-              },
-            }}
-            onClick={() => signOut(auth)}
-          >
-            <Icon as={PiSignOutBold} color="blue.900" />
-          </IconButton>
-        </Flex>
+        <UserButton user={user} />
       </Box>
       {/* Drawer */}
       <Drawer
@@ -314,108 +226,42 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
                 mb: 5,
               }}
             >
-              {/* Home */}
-              <ListItem
-                sx={{
-                  cursor: "pointer",
-                  bgColor: pathname === "/" ? "blue.900" : "white",
-                  color: pathname === "/" ? "gray.50" : "black",
-                  borderRadius: "lg",
-                  p: 2,
-                  fontSize: "18px",
-                  fontWeight: 400,
-                  _hover: {
-                    bg: pathname === "/" ? "blue.800" : "#F5F7FA",
-                  },
-                }}
-                onClick={() => {
-                  navigate("/");
-                  onClose();
-                }}
-              >
-                <ListIcon
+              {listItemsData?.map((item) => (
+                <ListItem
                   sx={{
-                    width: "25px",
-                    height: "25px",
+                    cursor: "pointer",
+                    bgColor: pathname === item.path ? "blue.900" : "white",
+                    color: pathname === item.path ? "gray.50" : "black",
+                    borderRadius: "lg",
+                    p: 2,
+                    fontSize: "18px",
+                    fontWeight: 400,
+                    _hover: {
+                      bg: pathname === item.path ? "blue.800" : "#F5F7FA",
+                    },
+                  }}
+                  onClick={() => {
+                    navigate(item.path);
+                    onClose();
                   }}
                 >
-                  <Icon
-                    as={AiFillHome}
+                  <ListIcon
                     sx={{
-                      color: pathname === "/" ? "gray.50" : "blue.900",
+                      width: "25px",
+                      height: "25px",
                     }}
-                  />
-                </ListIcon>
-                Home
-              </ListItem>
-              {/* Archive */}
-              <ListItem
-                sx={{
-                  cursor: "pointer",
-                  bgColor: pathname === "/archive" ? "blue.900" : "white",
-                  color: pathname === "/archive" ? "gray.50" : "black",
-                  borderRadius: "lg",
-                  p: 2,
-                  fontSize: "18px",
-                  fontWeight: 400,
-                  _hover: {
-                    bg: pathname === "/archive" ? "blue.800" : "#F5F7FA",
-                  },
-                }}
-                onClick={() => {
-                  navigate("/archive");
-                  onClose();
-                }}
-              >
-                <ListIcon
-                  sx={{
-                    width: "25px",
-                    height: "25px",
-                  }}
-                >
-                  <Icon
-                    as={IoMdArchive}
-                    sx={{
-                      color: pathname === "/archive" ? "gray.50" : "blue.900",
-                    }}
-                  />
-                </ListIcon>
-                Archive
-              </ListItem>
-              {/* Bin */}
-              <ListItem
-                sx={{
-                  cursor: "pointer",
-                  bgColor: pathname === "/bin" ? "blue.900" : "white",
-                  color: pathname === "/bin" ? "gray.50" : "black",
-                  borderRadius: "lg",
-                  p: 2,
-                  fontSize: "18px",
-                  fontWeight: 400,
-                  _hover: {
-                    bg: pathname === "/bin" ? "blue.800" : "#F5F7FA",
-                  },
-                }}
-                onClick={() => {
-                  navigate("/bin");
-                  onClose();
-                }}
-              >
-                <ListIcon
-                  sx={{
-                    width: "25px",
-                    height: "25px",
-                  }}
-                >
-                  <Icon
-                    as={MdDelete}
-                    sx={{
-                      color: pathname === "/bin" ? "gray.50" : "blue.900",
-                    }}
-                  />
-                </ListIcon>
-                Bin
-              </ListItem>
+                  >
+                    <Icon
+                      as={item.icon}
+                      sx={{
+                        color: pathname === item.path ? "gray.50" : "blue.900",
+                      }}
+                    />
+                  </ListIcon>
+
+                  {item.name}
+                </ListItem>
+              ))}
             </List>
             <Flex
               direction="column"
@@ -502,43 +348,7 @@ const Sidebar = ({ btnRef, isOpen, onClose }) => {
           </DrawerBody>
 
           <DrawerFooter>
-            <Flex
-              sx={{
-                direction: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                width: "100%",
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                height: "60px",
-                px: 3,
-                borderTop: "solid 1px",
-                borderTopColor: "#E2E8F0",
-              }}
-            >
-              <HStack spacing={2} alignItems="center">
-                <Avatar name={user?.name} src={user?.photo} size="sm" />
-                <Text
-                  sx={{
-                    fontWeight: 400,
-                  }}
-                >
-                  {user?.name}
-                </Text>
-              </HStack>
-              <IconButton
-                sx={{
-                  bgColor: "white",
-                  _hover: {
-                    bgColor: "white",
-                  },
-                }}
-                onClick={() => signOut(auth)}
-              >
-                <Icon as={PiSignOutBold} color="blue.900" />
-              </IconButton>
-            </Flex>
+            <UserButton user={user} />
           </DrawerFooter>
         </DrawerContent>
       </Drawer>

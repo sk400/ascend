@@ -26,7 +26,7 @@ import { createListItem } from "../utils/crudFunctions";
 
 const CreateListItem = ({ type, numOfItems }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { user, setBoards, boards } = useGlobalState();
+  const { user, setBoards } = useGlobalState();
   const { boardId } = useParams();
   const [data, setData] = useState({});
 
@@ -42,17 +42,26 @@ const CreateListItem = ({ type, numOfItems }) => {
   const handleChange = (e) =>
     setData({ ...data, [e.target.name]: e.target.value });
 
+  /**
+   * Handles the click event when the user clicks on the submit button of the modal.
+   * It creates a new item object and adds it to the tasks array in the specified board in the global state.
+   * It also calls the createListItem function to save the item data to the database.
+   * Finally, it closes the modal and resets the data state.
+   */
   const handleClick = () => {
+    // Check if all the required fields are provided
     if (!data?.title || !data?.description || !data?.priority || !itemType) {
       alert("Please provide all the required fields");
       return;
     }
 
+    // Create a new item object with the provided data and a unique ID
     const newItem = {
       ...data,
       id: Date.now(),
     };
 
+    // Update the boards array in the global state by adding the new item to the tasks array of the specified board
     setBoards((prevBoards) => {
       const boardIndex = prevBoards?.findIndex(
         (board) => board?.id.toString() === boardId
@@ -63,6 +72,7 @@ const CreateListItem = ({ type, numOfItems }) => {
       }
       let updatedBoards = [...prevBoards];
 
+      // Initialize the tasks array of the specified board if it doesn't exist
       updatedBoards[boardIndex] = {
         ...updatedBoards[boardIndex],
         tasks: {
@@ -71,11 +81,13 @@ const CreateListItem = ({ type, numOfItems }) => {
         },
       };
 
+      // Add the new item to the tasks array of the specified board
       updatedBoards[boardIndex].tasks[itemType].push(newItem);
 
       return updatedBoards;
     });
 
+    // Call the createListItem function to save the item data to the database
     if (user?.email) {
       createListItem({
         data: newItem,
@@ -84,6 +96,8 @@ const CreateListItem = ({ type, numOfItems }) => {
         type: itemType,
       });
     }
+
+    // Close the modal and reset the data state
     onClose();
     setData({});
   };
