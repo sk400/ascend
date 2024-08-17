@@ -6,7 +6,7 @@ Ascend is a web-based Kanban board application designed to help you visualize an
 
 ## Features
 
-- Create and manage boards, lists, and tasks
+- Create and manage boards and tasks
 - Drag-and-drop functionality for easy task management
 - User authentication with Google sign-in and email link
 - Real-time data synchronization with Firebase
